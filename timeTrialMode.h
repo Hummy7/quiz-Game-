@@ -5,133 +5,208 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-#include <conio.h>
+#include <conio.h> 
 #include <windows.h> //for gotoxy function
-#include <unistd.h> //for sleep function
+#include <vector>
+#include <fstream> //for file handling
+#include <string>
 
 namespace timeTrialMode
 {   
-    //for questions
-    struct ques
+    //Forward Declration
+    void start();
+   
+    class TimeTrialMode
     {
-        std::string question;
+    private:
+        std::string questions;
         std::string optionOne;
         std::string optionTwo;
         std::string optionThree;
         std::string optionFour;
-        char answers;
+        char answer;
+        
+    public:
+        TimeTrialMode(std::string& ques, std::string& opOne, std::string& opTwo, std::string& opThree, std::string& opFour, char ans);
+
+        std::string getQuestion(){return questions;};
+        std::string getOptionOne(){return optionOne;};
+        std::string getOptionTwo(){return optionTwo;};
+        std::string getOptionThree(){return optionThree;};
+        std::string getOptionFour(){return optionFour;};
+        char getAnswer(){return answer;};
     };
 
-    class TimeTrialMode
+    std::ifstream g_questionFile;
+    std::vector<TimeTrialMode> g_questionList;
+
+    void gotoXY(int x, int y) 	//function to decide location of the screem
     {
-    private:
+        HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE); 		 
+        COORD CursorPosition; 
+        CursorPosition.X = x; // Locates column
+        CursorPosition.Y = y; // Locates Row
+            
+        SetConsoleCursorPosition(console,CursorPosition); // Sets position for next thing to be printed 
+    }
+
+    void startQuiz()
+    {   
+        time_t startTime, currentTime;
+        int remainingTime;
+
         double maxtime { 60 };
         int quesNum { 0 };
         int index { 0 };
-        char answer{};
         int playerScore{};
         char a;
-        
-    public:
-      
-        void startQuiz()
-        {   
-            time_t startTime, currentTime;
-            int remainingTime;
+        int numOfQuestion;
 
-            startTime = time(NULL);
+        startTime = time(NULL);
 
-            struct ques xyz[6];
+        //ask the user how many question does the txt file have
+        std::cout << "How many questions? ";
+        std::cin >> numOfQuestion;
 
-            xyz[0] = {"Which of the following is not the characteristic of a class?","Generic","Friend","Inline","Inline",'c'};
-            xyz[1] = {"Which of the following statements is most suitable for the C++ language?","Statically typed language.","Dynamically typed language.","All","Type-less language.",'a'};
-            xyz[2] = {"Which of the following operators doesn�t allow overloading?","Comparison operator.","Assignment operator.","Scope resolution operator.","Dereference operator.",'c'};
-            xyz[3] = {"Which of the following isn�t supported in C++ language?","Namespaces.","Inheritance","Reflection.","Polymorphism.",'c'};
-            xyz[4] = {"Which of the following keywords can�t appear inside a class definition?","template","static","virtual","friend",'a'};
+        start();
 
-            do
+        do
+        {
+            currentTime = time(NULL);
+            remainingTime = maxtime - difftime(currentTime, startTime);
+
+            gotoXY(10, 0);
+            std::cout << "Time remaining: " << remainingTime << " seconds\r" << std::flush;
+            Sleep(1);
+
+            if (quesNum == index)
             {
-                currentTime = time(NULL);
-                remainingTime = maxtime - difftime(currentTime, startTime);
+                system("cls");
 
-                gotoXY(10, 0);
-                std::cout << "Time remaining: " << remainingTime << " seconds\r" << std::flush;
-                sleep(1);
+                quesNum++;
 
-                if (quesNum == index)
+                gotoXY(0, 2);
+                    
+                std::cout << "Question # " << quesNum << '\n';
+                std::cout << g_questionList[index].getQuestion();
+                std::cout << "\nA. " << g_questionList[index].getOptionOne() << '\n';
+                std::cout << "B. " << g_questionList[index].getOptionTwo() << '\n';
+                std::cout << "C. " << g_questionList[index].getOptionThree() << '\n';
+                std::cout << "D. " <<g_questionList[index].getOptionFour() << '\n';
+                std::cout << "\nSelect your Option ==> ";
+            }
+
+            if ( _kbhit() )
+            {
+                a = _getch();
+
+                gotoXY(0, 10);
+                std::cout << a;
+
+                if(int(a)==13)
                 {
-                    system("cls");
+                    std::cout << "\nYou skipped this Question";
+                } 
 
-                    quesNum++;
+                else 
+                {
+                    if( a == g_questionList[index].getAnswer())
+                    {
+                        gotoXY(0, 10);
+                        std::cout << "\nCongratulation You selected right option";
+                        playerScore++; //This will increment if the player get the correct answer
+                    } 
 
-                    answer = xyz[index].answers;
-
-                    gotoXY(0, 2);
-                    std::cout << "Question # " << quesNum << '\n';
-                    std::cout << xyz[index].question;
-                    std::cout << "\nA. " << xyz[index].optionOne << '\n';
-                    std::cout << "B. " << xyz[index].optionTwo << '\n';
-                    std::cout << "C. " << xyz[index].optionThree << '\n';
-                    std::cout << "D. " << xyz[index].optionFour << '\n';
-                    std::cout << "\nSelect your Option ==> ";
+                    else 
+                    {
+                        gotoXY(0, 10);
+                        std::cout << "\nCorrect Option is  ==> "<< g_questionList[index].getAnswer() << '\n';
+                        std::cout << "You selected wrong option.";
+                    }
                 }
-
-                if ( _kbhit() )
-                {
-                   a= _getch();
-
-                   gotoXY(0, 10);
-                   std::cout << a;
-
-                   if(int(a)==13)
-                   {
-                        std::cout << "\nYou skipped this Question";
-                   } 
-
-                   else 
-                   {
-                        if(a==answer)
-                        {
-                            playerScore++;
-                            gotoXY(0, 10);
-                            std::cout << "\nCongratulation You selected right option";
-                        } 
-                        else 
-                        {
-                            gotoXY(0, 10);
-                            std::cout << "\nCorrect Option is  ==> "<< answer << '\n';
-                            std::cout << "You selected wrong option.";
-
-                        }
-                  }
 
                   _getch();
                   index++; 
-                }
-            }while(remainingTime != 0 && index < 5);
+            }
+        }while(remainingTime != 0 && index < numOfQuestion); //if the remainingtime == 0 and the index reach the numeber of question that the user want the program will stop
 
-            if (index < 4) 
-            {       
-                    system("cls");
-		            std::cout << "\nTime is up. You failed to attempt all questions"<< '\n';
-	        } 
-        }
+        if (index < numOfQuestion - 1) 
+        {       
+            system("cls");
+		    std::cout << "\nTime is up. You failed to attempt all questions"<< '\n';
+	    } 
+    }
 
-        void gotoXY(int x, int y) 	//function to decide location of the screem
+    TimeTrialMode::TimeTrialMode(std::string& ques, std::string& opOne, std::string& opTwo, std::string& opThree, std::string& opFour, char ans)
+    {
+        questions = ques;
+        optionOne = opOne;
+        optionTwo = opTwo;
+        optionThree = opThree;
+        optionFour = opFour;
+        answer = ans;
+    }
+
+    bool openFile(std::ifstream& quesFile)
+    {
+        std::string fileName;
+        
+        std::cout << "\nAdd .txt at the end of your filename.\n";
+        std::cout << "Filename: ";
+        std::getline(std::cin >> std::ws, fileName);
+        
+        //ifstream QuestionData;
+        quesFile.open(fileName);
+        
+        if (!quesFile.is_open())
         {
-            //A "handle" is a generic identifier (typically a pointer) used to represent something
-            //Retrieves a handle to the specified standard device (standard input, standard output).
-            HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE); 		 
-            COORD CursorPosition; 
-            CursorPosition.X = x; // Locates column
-            CursorPosition.Y = y; // Locates Row
-            //Sets the cursor position in the specified console screen buffer.
-            //A COORD structure that specifies the new cursor position, in characters. The coordinates are 
-            //the column and row of a screen buffer character cell. The coordinates must be within the 
-            //boundaries of the console screen buffer.
-            SetConsoleCursorPosition(console,CursorPosition); // Sets position for next thing to be printed 
+             std::cout << "Could not find database." << '\n';
+             return true;
         }
-    };
+           
+        else
+        {
+            std::cout << "Database sucessfully accessed!" << '\n';
+            return false;
+        }
+    }
+
+    //this function is responsible to fill the vector with the text that get from the file
+    void fillVector(std::vector <TimeTrialMode>& newQuestionList, std::ifstream& queFile)
+    {
+        std::string questions;
+        std::string optionOne;
+        std::string optionTwo;
+        std::string optionThree;
+        std::string optionFour;
+        char answer;
+        
+        for (int i = 0; i < 10; i++)
+        {
+            std::getline(queFile >> std::ws, questions);
+            std::getline(queFile >> std::ws, optionOne);
+            std::getline(queFile >> std::ws, optionTwo);
+            std::getline(queFile >> std::ws, optionThree);
+            std::getline(queFile >> std::ws, optionFour);
+            // std::getline(queFile >> std::ws, answer);
+            queFile >> answer; queFile.ignore(1000, '\n');
+    
+            TimeTrialMode newQuestion(questions, optionOne, optionTwo, optionThree, optionFour, answer);
+            newQuestionList.push_back(newQuestion);
+        }
+    }
+
+    void start()
+    {
+        
+        while (openFile(g_questionFile))
+        {
+            openFile(g_questionFile);
+        }
+
+        fillVector(g_questionList, g_questionFile);
+    }
+
 } 
 
 #endif
