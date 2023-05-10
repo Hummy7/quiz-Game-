@@ -2,6 +2,8 @@
 #include "classicMode.h"
 #include "passAndPlay.h"
 #include "timeTrialMode.h"
+#include "survivalMode.h"
+#include "essential.h"
 
 //This class is responsible for mainmenu
 class MainMenu
@@ -41,8 +43,9 @@ public:
     {
         classicMode::ClassicMode classic;
         passAndPlay::PassAndPlay pAndP;
-        timeTrialMode::TimeTrialMode timeMode;
-
+        timeTrialModes::TimeTrialMode timeMode;
+        survivalModes::SurvivalMode surMode;
+        
         std::cout << "\n=-=-=-=- Select -=-=-=-=\n"
                   << "\n[1] Classic"
                   << "\n[2] Time Trial"
@@ -56,23 +59,32 @@ public:
             case 1: 
                 classic.startGame();
                 break;
+
             case 2:
-                timeMode.startQuiz();
+                 timeMode.startQuiz();
+                 break;
+                
                 break;
             case 3:
                 pAndP.startGame();
+                break;
+            
+            case 4:
+                surMode.startQuiz();
 
             default:
                 break;
         }
-    
     }
 };
 
 int main()
 {
     MainMenu menu;
-
+    
+    essential::loading();
+    essential::setcolor(essential::WHITE);
+    system("cls");
     menu.selectMenu();
 
     return 0;
