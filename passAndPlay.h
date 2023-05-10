@@ -3,157 +3,201 @@
 #define PASSANDPLAY_H
 
 #include <iostream>
-#include <string_view> //Using std::string_View instead of std::string to avoid expensive copy
 #include <vector>
 #include <algorithm> 
 #include <string> //To use getline function
 #include <windows.h> // for sleep function
+#include <conio.h>
 
 #define TOTAL_SCORE 10
 
 namespace passAndPlay
 {
+
+    class Question 
+    {
+    public:
+        std::string question;
+        char answer;
+        std::string opOne;
+        std::string opTwo;
+        std::string opThree;
+        std::string opFour;
+
+        Question(std::string questions, std::string opOnes, std::string opTwos, std::string opThrees, std::string opFours, char answers) 
+        {
+            question = questions;
+            opOne = opOnes;
+            opTwo = opTwos;
+            opThree = opThrees;
+            opFour = opFours;
+            answer = answers;
+        }
+    };
+    
     class PassAndPlay
     {
     private:
         //This is where variables should go 
         std::string playerNameOne{};
         std::string playerNameTwo{};
+
+        std::vector <Question> listOfQuestionPOne;
+        std::vector <Question> listOfQuestionPTwo;
         
         int playerOneScore{};
         int playerTwoScore{};
 
+        int quesNum { 0 };
+        int index { 0 };
+        char a{};
+        int numQuestions{};
+
+        bool gameOver = false;
         bool makeTurn = true;
-
-        std::string userInputtedAns{};
-
-        //PlayerOne
-        //This is where the question for player one store
-        std::vector <std::string_view> ques;
-        std::vector <std::string_view> quesAns;
-        
-        //PlayerTwo
-        //This is where the question for player two store
-        std::vector <std::string_view> questions;
-        std::vector <std::string_view> questionsAnswer;
 
     public:
         void askPlayerName();
         void makeTurns();
-        void performAskingUser(std::string_view);
+        void performAskingUser(std::string&);
         void startGame();
-        void questionsOne(std::string_view);
-        void questionsTwo(std::string_view);
+        void questionsTwo(std::string& pNameTwo);
+        void questionsOne(std::string& pNameOne);
 
-        void addQuestionPOne(std::string_view idQues, std::string_view idAns)
+        //add question to the vector for playerone
+        void addQuestionOne(Question addQuestionOne)
         {
-            ques.push_back(idQues);
-            quesAns.push_back(idAns);
+            listOfQuestionPOne.push_back(addQuestionOne);
         }
 
-        void addQuestionPTwo(std::string_view idQuesTwo, std::string_view idAnsTwo)
+        //add question to the vector for playertwo
+        void addQuestionTwo(Question addQuestionTwo)
         {
-            questions.push_back(idQuesTwo);
-            questionsAnswer.push_back(idAnsTwo);
+            listOfQuestionPTwo.push_back(addQuestionTwo);
         }
 
-        void displayQuestion(std::vector <std::string_view> correctAns, std::string_view playerNames, std::vector <std::string_view> quesToDis)
-        {   
-            for ( int x { 0 }; x < 10; ++x )
-            {   
-                // system("cls"); //Clear the screen before going to the next question
+        void gotoXY(int x, int y) 	//function to decide location of the screem
+        {
+            HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE); 		 
+            COORD CursorPosition; 
+            CursorPosition.X = x; // Locates column
+            CursorPosition.Y = y; // Locates Row
                 
-                std::cout << "\nQuestion #" << (x + 1) << '\n';
-                std::cout << quesToDis[x];
-
-                std::cout << "Select Option (A-B) or Enter to skip the question:";
-                std::getline(std::cin >> std::ws, userInputtedAns);
-
-                checkAnswer(userInputtedAns, correctAns, x, playerNames);
-            }
+            SetConsoleCursorPosition(console,CursorPosition); // Sets position for next thing to be printed 
         }
 
-        void checkAnswer(std::string& choice, std::vector <std::string_view> correctAns, int index, std::string_view name)
+        void displayQuestion(std::string& playerNames, std::vector <Question> listOfQuestion)
         {   
-            auto itOne = ques.begin();
-            auto itTwo = questions.begin();
-
-            auto itOneAns = quesAns.begin();
-            auto itTwoAns = questionsAnswer.begin();
-
-            if (choice == correctAns[index])
-            {
-                //erase question if the player pick the right answer
-                (name == playerNameOne) ?  ques.erase(itOne) : questions.erase(itTwo);
-
-                //erase the correct ans if the player pik the right answer
-                (name == playerNameOne) ?  quesAns.erase(itOneAns) : questionsAnswer.erase(itTwoAns);
-                
-                //Increment score
-                (name == playerNameOne) ? playerOneScore++ : playerTwoScore++;
-            }
-
-            //If the players choose the wrong answer the player will switch to another player
-            else
-            {
-                if (name == playerNameOne)
-                {
-                    if (makeTurn)
-                    {
-                        makeTurn = false;
-                        makeTurns();
-                    }
-                        
-                    else
-                    {
-                        makeTurn = true;
-                        makeTurns();
-                    }  
-                }
-
-                else
-                {
-                    if (makeTurn) 
-                    {
-                        makeTurn = false;
-                        makeTurns();
-                    }
-                        
-                    else
-                    {
-                        makeTurn = true;
-                        makeTurns();
-                    }
-                }
-            }
-        }
-
-        void checkWinner()
-        {
-            if (playerOneScore == TOTAL_SCORE)
-            {
-                std::cout << playerNameOne << " You win!!!!";
-            }
+            auto itOne = listOfQuestionPOne.begin();
+            auto itTwo = listOfQuestionPTwo.begin();
             
-            else if (playerTwoScore == TOTAL_SCORE)
-            {
-                std::cout << playerNameOne << " You win!!!!";
+            while (!gameOver)
+            {   
+                Sleep(1000);
+                system("cls");
+                for (int x { 0 }; x < 6; ++x)
+                {
+                    gotoXY(23, 5);
+                    std::cout << "Question # " << x + 1<< '\n';
+                    gotoXY(23, 7);
+                    std::cout << listOfQuestion[x].question;
+                    gotoXY(23, 9);
+                    std::cout << "A. " << listOfQuestion[x].opOne << '\n';
+                    gotoXY(23, 10);
+                    std::cout << "B. " << listOfQuestion[x].opTwo << '\n';
+                    gotoXY(23, 11);
+                    std::cout << "C. " << listOfQuestion[x].opThree << '\n';
+                    gotoXY(23, 12);
+                    std::cout << "D. " << listOfQuestion[x].opFour << '\n';
+                    gotoXY(23, 14);
+                    std::cout << "Select your Option ==> ";
+                    std::cin >> a;
+
+                    if(int(a)==13)
+                    {    
+                        gotoXY(23, 16);
+                        std::cout << "You skipped this Question";
+                    } 
+
+                    else 
+                    {
+                        if( a == listOfQuestion[x].answer)
+                        {   
+                            gotoXY(23, 16);
+                            std::cout << "Congratulation You selected right option";
+                            (playerNames == playerNameOne) ?  listOfQuestionPOne.erase(itOne) : listOfQuestionPTwo.erase(itTwo);
+
+                            (playerNames == playerNameOne) ? playerOneScore++ : playerTwoScore++;
+                        } 
+
+                        else 
+                        {   
+                            gotoXY(23, 16);
+                            std::cout << "You selected wrong option.";
+                            
+                            if (playerNames == playerNameOne)
+                            {
+                                if (makeTurn)
+                                {
+                                    makeTurn = false;
+                                    makeTurns();
+                                }
+                                        
+                                else
+                                {
+                                    makeTurn = true;
+                                    makeTurns();
+                                }  
+                            }
+
+                            else
+                            {
+                                if (makeTurn) 
+                                {
+                                    makeTurn = false;
+                                    makeTurns();
+                                }
+                                        
+                                else
+                                {
+                                    makeTurn = true;
+                                    makeTurns();
+                                }
+                            }
+                        }
+                    }
+                }
+            
+                if (playerOneScore == TOTAL_SCORE)
+                {
+                    std::cout << playerNameOne << " You win!!!!";
+                    gameOver = true;
+                }
+                    
+                else if (playerTwoScore == TOTAL_SCORE)
+                {
+                    std::cout << playerNameOne << " You win!!!!";
+                    gameOver = true;
+                }
+                //TODO:Add winner screen
             }
         }
     };
 
     void PassAndPlay::startGame()
-    {
+    {   
+        system("cls");
         askPlayerName();
         makeTurns();
     }
     
     //Ask player name
     void PassAndPlay::askPlayerName()
-    {
-        std::cout << "\nPlayer one name: ";
+    {   
+        gotoXY(23, 5);
+        std::cout << "Player one name: ";
         std::getline(std::cin >> std::ws, playerNameOne); //Using std::ws to ignore leading whitespaces
-
+        gotoXY(23, 7);
         std::cout << "Player two name: ";
         std::getline(std::cin >> std::ws, playerNameTwo);
 
@@ -164,26 +208,27 @@ namespace passAndPlay
     {   
         if (makeTurn)
         {   
+            system("cls");
             performAskingUser(playerNameOne);
-            checkWinner();
         }
 
         else
-        {  
+        {   
+            system("cls");
             performAskingUser(playerNameTwo);
-            checkWinner();
         }
     }
 
-    void PassAndPlay::performAskingUser(std::string_view turnPlayerName)
+    void PassAndPlay::performAskingUser(std::string& turnPlayerName)
     {   
         std::string userChoice{};
 
         if (turnPlayerName == playerNameOne)
         {
             while (true)
-            {
-                std::cout << turnPlayerName << " it's your turn\n";
+            {   
+                gotoXY(23, 5);
+                std::cout << turnPlayerName << " it's your turn. . . . . ";
                 questionsOne(turnPlayerName);
                 break;
             }
@@ -192,158 +237,39 @@ namespace passAndPlay
         else
         {
              while (true)
-            {
-                std::cout << turnPlayerName << "it's your turn\n";
+            {   
+                gotoXY(23, 5);
+                std::cout << turnPlayerName << " it's your turn. . . . . ";
                 questionsTwo(turnPlayerName);
                 break;
             }
         }
     }
 
-    //this function hold the questions for player one
-    void PassAndPlay::questionsOne(std::string_view pName)
+    //This function hold the questions for player two
+    void PassAndPlay::questionsTwo(std::string& pNameTwo)
     {        
-        std::string
-        question01 = "\nThis is a part of speech that shows the relationship of a noun or pronoun to another word. They can indicate time, place, or relationship.\n"
-        " a) noun\n"
-        " b) pronoun\n"
-        " c) adjective\n"
-        " d) preposition\n\n",
-        question02 = "\nWhich word indicates correct spelling?\n"
-        " a) belive\n"
-        " b) believe \n"
-        " c) bilieve\n"
-        " d) beleive\n\n",
-        question03 = "\n'The wind whisper to the trees as it creeps in the night' this is an example of what figure of speech?\n" 
-        " a) smile\n" 
-        " b) personification\n" 
-        " c) metaphor\n" 
-        " d) hyperbole\n\n",
-        question04 = "\nThis is en element of poetry that pertain to the series of lines grouped together and separated by an empty line from other stanzas. They are the equivalent of a paragraph in an essay.\n"
-        " a) rhyme\n"
-        " b) stanza\n"
-        " c) form\n"
-        " d) meter\n\n",
-        question05 = "\nA kind of sentence that makes a statement\n"
-        " a) declarative\n" 
-        " b) interrogative\n" 
-        " c) imperative\n" 
-        " d) exclamatory\n\n",
-        question06 = "\nThis pertains to the prosodic feature of speech that is the relative emphasis or prominence given to a certain syllable in a word, or to a certain word in a phrase or sentence\n" 
-        " a) pause\n" 
-        " b) stress\n" 
-        " c) intonation\n" 
-        " d) pitch\n\n",
-        question07 = "\nthe most important element of a story; they were the ones who play certain roles and acts in the story itself.\n" 
-        " a) plot\n" 
-        " b) settings\n" 
-        " c) characters\n" 
-        " d) theme\n\n",
-        question08 = "\nWhat _______ when I called?\n"
-        " a) Was you doing\n"
-        " b) Was you do\n"
-        " c) Were you doing\n"
-        " d) You were doing\n\n",
-        question09 = "\nWhat is the study of languages?\n"
-        " a) Phonetics\n" 
-        " b) Syntax\n"   
-        " c) Linguistics\n" 
-        " d) Semantics\n\n",
-        question10 = "\nPhonetics is the study of the sounds of language. What do we call these sounds?\n" 
-        " a) Morphemes\n" 
-        " b) Syntax\n" 
-        " c) Lexicology\n" 
-        " d) Phonemes\n\n";
+        addQuestionTwo(Question("who is me", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionTwo(Question("who is you?", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionTwo(Question("tang ina mo", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionTwo(Question("tang ina nya", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionTwo(Question("tang ina nyong lahat", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionTwo(Question("hala sya", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
 
-       addQuestionPOne(question01, "d");
-       addQuestionPOne(question02, "b");
-       addQuestionPOne(question03, "b");
-       addQuestionPOne(question04, "b");
-       addQuestionPOne(question05, "a");
-       addQuestionPOne(question06, "b");
-       addQuestionPOne(question07, "c");
-       addQuestionPOne(question08, "c");
-       addQuestionPOne(question09, "c");
-       addQuestionPOne(question10, "d");
-
-    //     //Randomizing the questions
-    //    srand(static_cast<unsigned int>(time(0)));
-	//    std::random_shuffle(ques.begin(), ques.end());
-
-       displayQuestion(quesAns, pName, ques);
+        displayQuestion(pNameTwo, listOfQuestionPTwo);
     }    
 
-    //This function hold the questions for player two
-    void PassAndPlay::questionsTwo(std::string_view pNames)
+    //this function add question for the player one
+    void PassAndPlay::questionsOne(std::string& pNameOne)
     {        
-        std::string
-        question1 = "\nThis is a part of speech that shows the relationship of a noun or pronoun to another word. They can indicate time, place, or relationship.\n"
-        " a) noun\n"
-        " b) pronoun\n"
-        " c) adjective\n"
-        " d) preposition\n\n",
-        question2 = "\nWhich word indicates correct spelling?\n"
-        " a) belive\n"
-        " b) believe \n"
-        " c) bilieve\n"
-        " d) beleive\n\n",
-        question3 = "\n'The wind whisper to the trees as it creeps in the night' this is an example of what figure of speech?\n" 
-        " a) smile\n" 
-        " b) personification\n" 
-        " c) metaphor\n" 
-        " d) hyperbole\n\n",
-        question4 = "\nThis is en element of poetry that pertain to the series of lines grouped together and separated by an empty line from other stanzas. They are the equivalent of a paragraph in an essay.\n"
-        " a) rhyme\n"
-        " b) stanza\n"
-        " c) form\n"
-        " d) meter\n\n",
-        question5 = "\nA kind of sentence that makes a statement\n"
-        " a) declarative\n" 
-        " b) interrogative\n" 
-        " c) imperative\n" 
-        " d) exclamatory\n\n",
-        question6 = "\nThis pertains to the prosodic feature of speech that is the relative emphasis or prominence given to a certain syllable in a word, or to a certain word in a phrase or sentence\n" 
-        " a) pause\n" 
-        " b) stress\n" 
-        " c) intonation\n" 
-        " d) pitch\n\n",
-        question7 = "\nthe most important element of a story; they were the ones who play certain roles and acts in the story itself.\n" 
-        " a) plot\n" 
-        " b) settings\n" 
-        " c) characters\n" 
-        " d) theme\n\n",
-        question8 = "\nWhat _______ when I called?\n"
-        " a) Was you doing\n"
-        " b) Was you do\n"
-        " c) Were you doing\n"
-        " d) You were doing\n\n",
-        question9 = "\nWhat is the study of languages?\n"
-        " a) Phonetics\n" 
-        " b) Syntax\n"   
-        " c) Linguistics\n" 
-        " d) Semantics\n\n",
-        questionI0 = "\nPhonetics is the study of the sounds of language. What do we call these sounds?\n" 
-        " a) Morphemes\n" 
-        " b) Syntax\n" 
-        " c) Lexicology\n" 
-        " d) Phonemes\n\n";
+       addQuestionOne(Question("who is me", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionOne(Question("who is you?", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionOne(Question("tang ina mo", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionOne(Question("tang ina nya", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionOne(Question("tang ina nyong lahat", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
+        addQuestionOne(Question("hala sya", "World wide web", "Wob web wb", "Wo WO Wo", "We we we", 'a'));
 
-       addQuestionPTwo(question1, "d");
-       addQuestionPTwo(question2, "b");
-       addQuestionPTwo(question3, "b");
-       addQuestionPTwo(question4, "b");
-       addQuestionPTwo(question5, "a");
-       addQuestionPTwo(question6, "b");
-       addQuestionPTwo(question7, "c");
-       addQuestionPTwo(question8, "c");
-       addQuestionPTwo(question9, "c");
-       addQuestionPTwo(questionI0, "d");
-
-    //     //Randomizing the questions
-    //    srand(static_cast<unsigned int>(time(0)));
-	//    std::random_shuffle(ques.begin(), ques.end());
-
-       displayQuestion(questionsAnswer, pNames, questions);
+        displayQuestion(pNameOne, listOfQuestionPOne);
     }    
 }
 
