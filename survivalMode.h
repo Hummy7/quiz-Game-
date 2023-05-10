@@ -20,15 +20,13 @@ namespace survivalModes
         std::ifstream g_questionFile;
         std::vector<questionMCQ::Question> g_questionList;
 
-        int g_numOfQuestion;
         int quesNum { 0 };
         int index { 0 };
         char a{};
         int playerScore{};
-        int playerLive{2};
         int isGameOver = false;
 
-        std::vector <std::string> lives = {"|", "|", "|", "|", "|"};
+        std::vector <std::string> lives = {"X", "X", "X", "X"};
 
         void gotoXY(int x, int y) 	//function to decide location of the screem
         {
@@ -42,10 +40,6 @@ namespace survivalModes
 
         void startQuiz()
         {   
-            //ask the user how many question does the txt file have
-            std::cout << "How many questions? ";
-            std::cin >> g_numOfQuestion;
-
             start();
 
             do
@@ -57,25 +51,25 @@ namespace survivalModes
                     quesNum++;
                     
                     for (int x { 0 }; x < 4; ++x)
-                    {   
+                    {
                         gotoXY(69, 3);
                         //This output the reaming lives of the player
                         std::cout << "Lives: " << lives[0] << lives[1] << lives[2] << lives[3];
                     }
-
+                    
                     gotoXY(23, 5);
                     std::cout << "Question # " << quesNum << '\n';
-                    gotoXY(23, 6);
+                    gotoXY(23, 7);
                     std::cout << g_questionList[index].getQuestion();
-                    gotoXY(23, 8);
-                    std::cout << "A. " << g_questionList[index].getOptionOne() << '\n';
                     gotoXY(23, 9);
-                    std::cout << "B. " << g_questionList[index].getOptionTwo() << '\n';
+                    std::cout << "A. " << g_questionList[index].getOptionOne() << '\n';
                     gotoXY(23, 10);
-                    std::cout << "C. " << g_questionList[index].getOptionThree() << '\n';
+                    std::cout << "B. " << g_questionList[index].getOptionTwo() << '\n';
                     gotoXY(23, 11);
+                    std::cout << "C. " << g_questionList[index].getOptionThree() << '\n';
+                    gotoXY(23, 12);
                     std::cout << "D. " <<g_questionList[index].getOptionFour() << '\n';
-                    gotoXY(23, 13);
+                    gotoXY(23, 14);
                     std::cout << "Select choices between (a -d): ";
                 }
 
@@ -84,13 +78,13 @@ namespace survivalModes
                 {
                     a = _getch();
 
-                    gotoXY(56, 13);
+                    gotoXY(56, 14);
                     std::cout << a;
 
                     //if the user press enter the program will consider it as skipped questioned
                     if(int(a)==13)
                     {
-                        gotoXY(23, 15);
+                        gotoXY(23, 16);
                         std::cout << "You skipped this Question";
                         lives[index].erase();
                     } 
@@ -99,28 +93,27 @@ namespace survivalModes
                     {
                         if( a == g_questionList[index].getAnswer())
                         {
-                            gotoXY(23, 15);
+                            gotoXY(23, 16);
                             std::cout << "Congratulation You selected right option";
                             playerScore++; //This will increment if the player get the correct answer
                         } 
 
                         else 
                         {
-                            gotoXY(23, 15);
-                            std::cout << "Correct Option is  ==> "<< g_questionList[index].getAnswer();
                             gotoXY(23, 16);
                             std::cout << "You selected wrong option.";
                             lives[index].erase(); //if the player choose the wrong answer the lives will be erase
                         }
                     }
 
-                    if (playerLive == 0)
+                    if (lives.empty())
                     {   
                         gotoXY(23, 17);
                         std::cout << "You have no lives sorry you lost";
                         isGameOver = true;
                         break;
                     }
+                    //TODO: add gameover screen
 
                     _getch();
                     index++; 
