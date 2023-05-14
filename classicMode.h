@@ -24,49 +24,41 @@ namespace classicMode
         std::vector <questionMCQ::Question> questionListVect;
         char yAndNChoice{};
 
+        questionMCQ::fileDoing gettingFiles;
+        questionIdentification::gettingQuesFile fileGathering;
+
     public:
-        int playerScore{};  
-        void startGame();
-        void askDifficulty();
-        void easyDiff();
-        void mediumDiff();
-        void hardDiff();
+        int playerScore{}; 
+        void startGame(void (*mainMenuAccess)(void));
+        void askDifficulty(void (*menu)(void));
+        void easyDiff(void (*menuAcess)(void));
+        void mediumDiff(void (*menus)(void));
+        void hardDiff(void (*menuss)(void));
         void displayScore();
-        void startQuestion();
 
-        void gotoXY(int x, int y) 	//function to decide location of the screem
-        {
-            HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE); 		 
-            COORD CursorPosition; 
-            CursorPosition.X = x; // Locates column
-            CursorPosition.Y = y; // Locates Row
-                
-            SetConsoleCursorPosition(console,CursorPosition); // Sets position for next thing to be printed 
-        }
-
-        void askTypeOfQuestion()
+        void askTypeOfQuestion(void (*menu)(void))
         {   
             int userChoice{};
-
+            
             system("cls");
-            gotoXY(23, 4);
+            essential::gotoXY(50, 5);
             std::cout << "-=-=- Select type of question -=-=-";
-            gotoXY(40, 6);
+            essential::gotoXY(50, 7);
             std::cout << "[1] Multiple Choices Question";
-            gotoXY(40, 7);
+            essential::gotoXY(50, 9);
             std::cout << "[2] Identification";
-            gotoXY(40, 10);
+            essential::gotoXY(50, 11);
             std::cout << "Select: ";
             std::cin >> userChoice;
 
             switch(userChoice)
             {
                 case 1:
-                    questionMCQ::main();
+                    gettingFiles.start(menu);
                     playerScore = questionMCQ::g_scoreOfPlayer;
                     break;
                 case 2:
-                    questionIdentification::main();
+                    fileGathering.start(menu);
                     playerScore = questionIdentification::g_scoreOfPlayer;
                     break;
             }
@@ -79,12 +71,12 @@ namespace classicMode
 
             if (!questionFile)
             {   
-                gotoXY(23, 5);
+                essential::gotoXY(23, 5);
                 std::cout << "Cannot open file!!";
                 return false;
             }
 
-            questionMCQ::fillVector(questionListVect, questionFile);
+            gettingFiles.fillVectorSecond(questionListVect, questionFile);
 
             //closing the file
             questionFile.close();
@@ -93,12 +85,12 @@ namespace classicMode
         }
     };
 
-    void ClassicMode::startGame()
+    void ClassicMode::startGame(void (*mainMenuAccess)(void))
     { 
         do 
         {   
             system("cls");
-            gotoXY(23, 5);
+            essential::gotoXY(23, 5);
             std::cout << "Do you want to load your own question? (y/n): ";
             std::cin >> yAndNChoice;
 
@@ -106,50 +98,45 @@ namespace classicMode
 
         if (yAndNChoice == 'y')
         {
-            startQuestion();
+            askTypeOfQuestion(mainMenuAccess);
         }
 
         else
         {
-            askDifficulty();
+            askDifficulty(mainMenuAccess);
         }
 
     }
 
-    void ClassicMode::startQuestion()
-    {
-        askTypeOfQuestion();
-    }
-
-    void ClassicMode::askDifficulty()
+    void ClassicMode::askDifficulty(void (*menu)(void))
     {   
         system("cls");
-        gotoXY(23, 4);
+        essential::gotoXY(23, 4);
         std::cout << " -=-=- Select Difficulty -=-=";
-        gotoXY(34, 6);
+        essential::gotoXY(34, 6);
         std::cout << "[1] Easy";
-        gotoXY(3, 8);
+        essential::gotoXY(34, 8);
         std::cout << "[2] Medium";
-        gotoXY(34, 10);
+        essential::gotoXY(34, 10);
         std::cout << "[3] Hard";
-        gotoXY(34, 12);
+        essential::gotoXY(34, 12);
         std::cout << "[4] Home";
-        gotoXY(34, 15);
+        essential::gotoXY(34, 15);
         std::cout << "Choice: ";
         std::cin >> userChoice; 
 
         switch (userChoice)
         {
             case 1:
-              easyDiff();
+              easyDiff(menu);
                 break;
 
             case 2:
-              mediumDiff();
+              mediumDiff(menu);
                 break;
 
             case 3:
-              hardDiff();
+              hardDiff(menu);
                 break;
 
             case 4:
@@ -160,41 +147,35 @@ namespace classicMode
         }
     }
 
-    void ClassicMode::easyDiff()
+    void ClassicMode::easyDiff(void (*menuAcess)(void))
     {   
         bool result = getFile("easy.txt");
 
         if (result)
         {
-            questionMCQ::printVector(questionListVect);
+            gettingFiles.printVectorTwo(questionListVect, menuAcess);
         }
     }
 
-    void ClassicMode::mediumDiff()
+    void ClassicMode::mediumDiff(void (*menus)(void))
     {
         bool result = getFile("medium.txt");
 
         if (result)
         {
-            questionMCQ::printVector(questionListVect);
+            gettingFiles.printVectorTwo(questionListVect, menus);
         }
     }
 
-    void ClassicMode::hardDiff()
+    void ClassicMode::hardDiff(void (*menuss)(void))
     {
         bool result = getFile("hard.txt");
 
         if (result)
         {
-            questionMCQ::printVector(questionListVect);
+            gettingFiles.printVectorTwo(questionListVect, menuss);
         }
     }
-
-    void ClassicMode::displayScore()
-    {
-        std::cout << playerScore;
-    }
-    
 }
 
 #endif
