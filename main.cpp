@@ -6,6 +6,8 @@
 #include "essential.h"
 
 //This class is responsible for mainmenu
+void selectMenu();
+
 class MainMenu
 {
 private:
@@ -14,63 +16,57 @@ private:
 
 public:
     void mainMenu()
-    {
-        std::cout << "\n=-=-=-=- Select -=-=-=-=\n"
-                  << "\n[1] Start quiz"
-                  << "\n[2] Exit\n"
-                  << "\nChoice: ";
-    }
-
-    void selectMenu()
     {   
-        mainMenu();
-        std::cin >> userChoice;
-    
-        switch (userChoice)
-        {
-            case 1: 
-                selectMode();
-                break;
-            case 2:
-                break;
-
-            default:
-                break;
-        }
+        system("cls");
+        essential::gotoXY(50, 5);
+        std::cout << "=-=-=-=- Select -=-=-=-=";
+        essential::gotoXY(55, 7);
+        std::cout << "[1] Start quiz";
+        essential::gotoXY(55, 9);
+        std::cout << "[2] Exit";
+        essential::gotoXY(55, 11);
+        std::cout << "Choice: ";
     }
-
+    
     void selectMode()
     {
         classicMode::ClassicMode classic;
         passAndPlay::PassAndPlay pAndP;
         timeTrialModes::TimeTrialMode timeMode;
         survivalModes::SurvivalMode surMode;
-        
-        std::cout << "\n=-=-=-=- Select -=-=-=-=\n"
-                  << "\n[1] Classic"
-                  << "\n[2] Time Trial"
-                  << "\n[3] Pass and play"
-                  << "\n[4] Survival\n"
-                  << "\nChoice: ";
-
+            
+        system("cls");
+        essential::gotoXY(50, 5);
+        std::cout << "=-=-=-=- Select -=-=-=-=";
+        essential::gotoXY(55, 7);
+        std::cout << "[1] Classic";
+        essential::gotoXY(55, 9);
+        std::cout << "[2] Time Trial";
+        essential::gotoXY(55, 11);
+        std::cout << "[3] Pass and play";
+        essential::gotoXY(55, 13);
+        std::cout << "[4] Survival";
+        essential::gotoXY(55, 15);
+        std::cout << "Choice: ";
         std::cin >> choice;
+
         switch (choice)
         {
             case 1: 
-                classic.startGame();
+                classic.startGame(&selectMenu);
                 break;
 
             case 2:
-                 timeMode.startQuiz();
-                 break;
-                
+                timeMode.startQuiz(&selectMenu);
                 break;
+                    
             case 3:
-                pAndP.startGame();
+                pAndP.startGame(&selectMenu);
                 break;
-            
+                
             case 4:
-                surMode.startQuiz();
+                surMode.startQuiz(&selectMenu);
+                break;
 
             default:
                 break;
@@ -78,14 +74,34 @@ public:
     }
 };
 
+void selectMenu()
+{   
+    int userChoice;
+
+    MainMenu menuAccess;
+
+    menuAccess.mainMenu();
+    std::cin >> userChoice;
+        
+    switch (userChoice)
+    {
+        case 1: 
+            menuAccess.selectMode();
+            break;
+        case 2:
+            break;
+
+        default:
+            break;
+    }
+}
+
 int main()
 {
+    // essential::loading();
+
     MainMenu menu;
-    
-    essential::loading();
     essential::setcolor(essential::WHITE);
     system("cls");
-    menu.selectMenu();
-
-    return 0;
+    selectMenu();
 }

@@ -5,33 +5,74 @@
 #include <iostream>
 #include <windows.h>
 #include <stdio.h>
+#include <random>
 
 namespace essential
 {
-
     enum color
     { //enumeration is a user-defined data type
-	NONE,
-	DARK_BLUE,
-	GREEN,
-	DARK_CYAN,
-	DARK_RED,
-	PURPLE,
-	DARK_YELLOW,
-	NORMAL,
-	GRAY,
-	BLUE,
-	LIME,
-	CYAN,
-	RED,
-	PINK,
-	YELLOW,
-	WHITE
+        NONE,
+        DARK_BLUE,
+        GREEN,
+        DARK_CYAN,
+        DARK_RED,
+        PURPLE,
+        DARK_YELLOW,
+        NORMAL,
+        GRAY,
+        BLUE,
+        LIME,
+        CYAN,
+        RED,
+        PINK,
+        YELLOW,
+        WHITE
     };
 
     void ebod();
     void setcolor(color newColor);
     void gotoXY(int x, int y);
+    void borderTwo();
+    void ebodTwo();
+    void border();
+    void resultScreen(void (*mainMenu)(void));
+    void askToMenu(void (*menu)(void));
+    void gameOverScreen(void (*func)(void));
+
+    void ebodTwo()
+    {
+ 			
+		for(int x = 20; x < 103; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(x,7);	
+            std::cout<<char(205);
+		}
+
+		for(int x = 8; x < 13; x++)
+        {
+			setcolor(CYAN);
+			gotoXY(20,x);	
+		    std::cout<<char(186);
+		}
+
+		for(int x = 8; x < 13; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(103,x);	
+            std::cout<<char(186);
+		}
+			setcolor(CYAN);
+
+		gotoXY(20,7);	
+		std::cout<<char(201);
+		gotoXY(103,7);	
+		std::cout<<char(187);
+		gotoXY(103,13);	
+		std::cout<<char(188);
+		gotoXY(20,13);	
+		std::cout<<char(200);
+    }
 
     void ebod()
     {
@@ -46,18 +87,18 @@ namespace essential
 		for(int x = 20; x < 103; x++)
         {
 			setcolor(PURPLE);
-			gotoXY(x,12);	
+			gotoXY(x,13);	
 			std::cout<<char(205);
 		}
 
-		for(int x = 5; x < 12; x++)
+		for(int x = 5; x < 13; x++)
         {
 			setcolor(CYAN);
 			gotoXY(20,x);	
 		    std::cout<<char(186);
 		}
 
-		for(int x = 5; x < 12; x++)
+		for(int x = 5; x < 13; x++)
         {
             setcolor(CYAN);
             gotoXY(103,x);	
@@ -69,11 +110,74 @@ namespace essential
 		std::cout<<char(201);
 		gotoXY(103,4);	
 		std::cout<<char(187);
-		gotoXY(103,12);	
+		gotoXY(103,13);	
 		std::cout<<char(188);
-		gotoXY(20,12);	
+		gotoXY(20,13);	
 		std::cout<<char(200);
     }
+
+    void borderTwo()
+    {
+        for(int x = 13; x < 16; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(20,x);	
+            std::cout<<char(186);
+        }
+
+        for(int x = 20; x < 103; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(x,16);	
+            std::cout<<char(205);
+        }
+
+        for(int x = 13; x < 16; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(103,x);	
+            std::cout<<char(186);
+        }
+
+        essential::setcolor(essential::CYAN);
+        gotoXY(103,16);	
+        std::cout<<char(188);
+        gotoXY(20,16);	
+        std::cout<<char(200);
+
+    }
+
+    void border()
+    {
+        for(int x = 13; x < 16; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(20,x);	
+            std::cout<<char(186);
+        }
+
+        for(int x = 20; x < 103; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(x,16);	
+            std::cout<<char(205);
+        }
+
+        for(int x = 13; x < 16; x++)
+        {
+            setcolor(CYAN);
+            gotoXY(103,x);	
+            std::cout<<char(186);
+        }
+
+        essential::setcolor(essential::CYAN);
+        gotoXY(103,16);	
+        std::cout<<char(188);
+        gotoXY(20,16);	
+        std::cout<<char(200);
+
+    }
+
 
     void setcolor(color newColor) 
     {
@@ -132,6 +236,93 @@ namespace essential
             // Wait for a short period of time to simulate the loading process
             Sleep(150);
         }
+    }
+
+    void gameOverScreen(void (*func)(void))
+    {
+        ebodTwo();
+        border();
+            
+        gotoXY(29,1);
+        essential::setcolor(essential::RED);
+        std::cout <<R"( _____                        _____                )";
+        gotoXY(29,2);
+        essential::setcolor(essential::RED);
+        std::cout <<R"(|  __ \                      |  _  |               )";
+        gotoXY(29,3);
+        essential::setcolor(essential::RED);
+        std::cout <<R"(| |  \/ __ _ _ __ ___   ___  | | | |_   _____ _ __ )";
+        gotoXY(29,4);
+        essential::setcolor(essential::RED);
+        std::cout <<R"(| | __ / _` | '_ ` _ \ / _ \ | | | \ \ / / _ \ '__|)";
+        gotoXY(29,5);
+        essential::setcolor(essential::RED);
+        std::cout <<R"(| |_\ \ |_| | | | | | |  __/ \ \_/ /\ V /  __/ |)";
+        gotoXY(29,6);
+        essential::setcolor(essential::RED);
+        std::cout <<R"(\____/\__,_|_| |_| |_|\___|   \___/  \_/ \___|_|)";
+
+        askToMenu(func);
+    }
+
+    void askToMenu(void (*menu)(void)) //passing the function as parameter using pointers
+    {   
+        char choiceUser{};
+
+        do 
+        {   
+            gotoXY(55, 17);
+            std::cout << "Do you want to continue (y/n): ";
+            std::cin >> choiceUser;
+
+        }while(choiceUser != 'y' && choiceUser != 'n');
+
+        if (choiceUser == 'y')
+        {   
+            menu();
+        }
+
+        else
+        {
+            std::exit(0);
+        }
+    }
+
+    void resultScreen(void (*mainMenu)(void))
+    {
+        essential::ebodTwo();
+        essential::border();
+        
+        gotoXY(29,1);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(______ _____ _____ _   _ _    _____ )";
+        gotoXY(29,2);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(| ___ \  ___/  ___| | | | |  |_   _|)";
+        gotoXY(29,3);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(| |_/ / |__ \ `--.| | | | |    | |)"; 
+        gotoXY(29,4);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(|    /|  __| `--. \ | | | |    | |)";
+        gotoXY(29,5);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(| |\ \| |___/\__/ / |_| | |____| |)";
+        gotoXY(29,6);
+        essential::setcolor(essential::GREEN);
+        std::cout <<R"(\_| \_\____/\____/ \___/\_____/\_/)";
+
+        askToMenu(mainMenu); 
+    }
+
+    //this function is responsible for randoming the quetsion
+    std::mt19937 randomingQuestion() 
+    {
+        std::random_device rd;
+	    std::seed_seq ss{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() }; 
+        std::mt19937 mt{ ss };
+
+        return mt;
     }
 }
 
