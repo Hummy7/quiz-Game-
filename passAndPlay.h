@@ -9,41 +9,21 @@
 #include <windows.h> // for sleep function
 #include <conio.h>
 #include "essential.h"
+#include "questionMultipleChoice.h"
 
 #define TOTAL_SCORE 10
 
 namespace passAndPlay
 {   
-    class Question 
-    {
-    public:
-        std::string question;
-        char answer;
-        std::string opOne;
-        std::string opTwo;
-        std::string opThree;
-        std::string opFour;
 
-        Question(std::string questions, std::string opOnes, std::string opTwos, std::string opThrees, std::string opFours, char answers) 
-        {
-            question = questions;
-            opOne = opOnes;
-            opTwo = opTwos;
-            opThree = opThrees;
-            opFour = opFours;
-            answer = answers;
-        }
-    };
-    
-    class PassAndPlay
+   class PassAndPlay
     {
     private:
-        //This is where variables should go 
-        std::string playerNameOne{};
-        std::string playerNameTwo{};
 
-        std::vector <Question> listOfQuestionPOne;
-        std::vector <Question> listOfQuestionPTwo;
+        std::vector <questionMCQ::Question> listOfQuestionPOne;
+        std::vector <questionMCQ::Question> listOfQuestionPTwo;
+
+        questionMCQ::fileDoing getFile;
         
         int playerOneScore{};
         int playerTwoScore{};
@@ -53,30 +33,56 @@ namespace passAndPlay
         char a{};
         int numQuestions{};
 
-        bool gameOver = true;
         bool makeTurn = true;
 
+        std::ifstream questionFileListOne;
+        std::ifstream questionFileListTwo;
+        
     public:
+     //This is where variables should go 
+        std::string playerNameOne{};
+        std::string playerNameTwo{};
+
         void askPlayerName();
         void makeTurns(void (*pass)(void));
         void performAskingUser(std::string&, void (*access)(void));
-        void startGame(void (*passMenu)(void));
+        void startGame(void (*passMenu)(void), std::string pNamed);
         void questionsTwo(std::string& pNameTwo, void (*accessReqTwo)(void));
         void questionsOne(std::string& pNameOne, void (*accessReqOne)(void));
 
-        //add question to the vector for playerone
-        void addQuestionOne(Question addQuestionOne)
+        void fillVect(std::vector <questionMCQ::Question>& newQuestionList, std::ifstream& queFile, char correctAnswer, std::string name)
         {
-            listOfQuestionPOne.push_back(addQuestionOne);
+            std::string questions;
+            std::string optionOne;
+            std::string optionTwo;
+            std::string optionThree;
+            std::string optionFour;
+            char answer;
+            
+            for (int i = 0; i < getFile.askUserQues; i++)
+            {
+                std::getline(queFile >> std::ws, questions);
+                std::getline(queFile >> std::ws, optionOne);
+                std::getline(queFile >> std::ws, optionTwo);
+                std::getline(queFile >> std::ws, optionThree);
+                std::getline(queFile >> std::ws, optionFour);
+                queFile >> answer; queFile.ignore(1000, '\n');
+        
+                questionMCQ::Question newQuestion(questions, optionOne, optionTwo, optionThree, optionFour, answer);
+                newQuestionList.push_back(newQuestion);
+
+                // std::shuffle(newQuestioinList.begin(), newQuestionList.end(), essential::randomingQuestion());
+                if (correctAnswer == newQuestionList[i].getAnswer())
+                {
+                    if (name == playerNameOne)
+                    {
+                        
+                    }
+                }
+            }
         }
 
-        //add question to the vector for playertwo
-        void addQuestionTwo(Question addQuestionTwo)
-        {
-            listOfQuestionPTwo.push_back(addQuestionTwo);
-        }
-
-        void displayQuestion(std::string& playerNames, std::vector <Question> listOfQuestion, void (*menuAccess)(void))
+        void displayQuestion(std::string& playerNames, std::vector <questionMCQ::Question> listOfQuestion, void (*menuAccess)(void))
         {   
             auto itOne = listOfQuestionPOne.begin();
             auto itTwo = listOfQuestionPTwo.begin();
@@ -93,71 +99,63 @@ namespace passAndPlay
                     essential::gotoXY(23, 5);
                     std::cout << "Question # " << x + 1<< '\n';
                     essential::gotoXY(23, 7);
-                    std::cout << listOfQuestion[x].question;
+                    std::cout << listOfQuestion[x].getQuestion();
                     essential::gotoXY(23, 9);
-                    std::cout << "A. " << listOfQuestion[x].opOne << '\n';
+                    std::cout << "A. " << listOfQuestion[x].getOptionOne() << '\n';
                     essential::gotoXY(23, 10);
-                    std::cout << "B. " << listOfQuestion[x].opTwo << '\n';
+                    std::cout << "B. " << listOfQuestion[x].getOptionTwo() << '\n';
                     essential::gotoXY(23, 11);
-                    std::cout << "C. " << listOfQuestion[x].opThree << '\n';
+                    std::cout << "C. " << listOfQuestion[x].getOptionThree() << '\n';
                     essential::gotoXY(23, 12);
-                    std::cout << "D. " << listOfQuestion[x].opFour << '\n';
+                    std::cout << "D. " << listOfQuestion[x].getOptionFour() << '\n';
                     essential::gotoXY(23, 14);
                     std::cout << "Press enter to skip";
                     essential::gotoXY(23, 15);
                     std::cout << "Select choices between (a - d) ";
                     std::cin >> a;
-
-                    if(int(a)==13)
-                    {    
+                  
+                    if( a == listOfQuestion[x].getAnswer())
+                    {   
                         essential::gotoXY(55, 17);
-                        std::cout << "You skipped this Question";
+                        std::cout << "Congratulation You selected right option";
+                            
+                        (playerNames == playerNameOne) ? playerOneScore++ : playerTwoScore++;
+
+                        (playerNames == playerNameOne) ?  listOfQuestionPOne.erase(itOne) : listOfQuestionPTwo.erase(itTwo);
                     } 
 
                     else 
-                    {
-                        if( a == listOfQuestion[x].answer)
-                        {   
-                            essential::gotoXY(55, 17);
-                            std::cout << "Congratulation You selected right option";
-                            (playerNames == playerNameOne) ?  listOfQuestionPOne.erase(itOne) : listOfQuestionPTwo.erase(itTwo);
-
-                            (playerNames == playerNameOne) ? playerOneScore++ : playerTwoScore++;
-                        } 
-
-                        else 
-                        {   
-                            essential::gotoXY(55, 17);
-                            std::cout << "You selected wrong option.";
+                    {   
+                        essential::gotoXY(55, 17);
+                        std::cout << "You selected wrong option.";
                             
-                            if (playerNames == playerNameOne)
+                        if (playerNames == playerNameOne)
+                        {
+                            if (makeTurn)
                             {
-                                if (makeTurn)
-                                {
-                                    makeTurn = false;
-                                    makeTurns(menuAccess);
-                                }
-                                        
-                                else
-                                {
-                                    makeTurn = true;
-                                    makeTurns(menuAccess);
-                                }  
+                                makeTurn = false;
+                                 makeTurns(menuAccess);
                             }
-
+                                        
                             else
                             {
-                                if (makeTurn) 
-                                {
-                                    makeTurn = false;
-                                    makeTurns(menuAccess);
-                                }
+                                makeTurn = true;
+                                makeTurns(menuAccess);
+                            }  
+                        }
+
+                        else
+                        {
+                            if (makeTurn) 
+                            {
+                                makeTurn = false;
+                                makeTurns(menuAccess);
+                            }
                                         
-                                else
-                                {
-                                    makeTurn = true;
-                                    makeTurns(menuAccess);
-                                }
+                            else
+                            {
+                                makeTurn = true;
+                                makeTurns(menuAccess);
                             }
                         }
                     }
@@ -190,7 +188,7 @@ namespace passAndPlay
         }
     };
 
-    void PassAndPlay::startGame(void (*passMenu)(void))
+    void PassAndPlay::startGame(void (*passMenu)(void), std::string pNamed)
     {   
         system("cls");
         askPlayerName();
@@ -207,6 +205,8 @@ namespace passAndPlay
         std::cout << "Player two name: ";
         std::getline(std::cin >> std::ws, playerNameTwo);
 
+        getFile.openFile(questionFileListOne);
+        getFile.openFile(questionFileListTwo);
     }
     
     //this function allow us to maketurn for the players
@@ -254,36 +254,15 @@ namespace passAndPlay
 
     //This function hold the questions for player two
     void PassAndPlay::questionsTwo(std::string& pNameTwo, void (*accessReqTwo)(void))
-    {        
-        addQuestionTwo(Question("Which of the following is not a fundamental data type in C++?", "bool", "double", "string", "int", 'c'));
-        addQuestionTwo(Question("Which of the following is a correct way to declare a pointer to an integer variable in C++?", "int* p;", "int* p;", "int* p;", "all of the above", 'd'));
-        addQuestionTwo(Question("Which of the following statements is true about pointers in C++?", "Pointers can only be used with arrays.", "Pointers cannot be passed as arguments to functions.", "Pointers cannot be assigned to NULL.", "Pointers can be used to dynamically allocate memory.", 'd'));
-        addQuestionTwo(Question("Which of the following operators is used for dynamic memory allocation in C++?", "new", "delete", "Malloc", "Free", 'c'));
-        addQuestionTwo(Question("It is the memory address of a variable", "Arithmetic operator", "Typedef", "Pointers", "Point", 'a'));
-        addQuestionTwo(Question("What is a class in C++?", "function", "predefined", "user defined", "varibale", 'a'));
-        addQuestionTwo(Question("By default access to members of a C++ class is ____________?", "public", "protected", "privacy", "private", 'd'));
-        addQuestionTwo(Question("Variable is just an array of characters. ", "one dimensional", "c string", "two dimensional", "dimensional", 'a'));
-        addQuestionTwo(Question("this operator use for conditional operator", "?", "=", "+", "==", 'a'));
-        addQuestionTwo(Question("this variable cannot be access outside the file", "static varibale", "variable", "global variable", "local variable", 'a'));
-
-        //TODO:Add more question like 20 or 15 question
+    {    
+        fillVect(listOfQuestionPTwo, questionFileListTwo, a, pNameTwo);
         displayQuestion(pNameTwo, listOfQuestionPTwo, accessReqTwo);
     }    
-
+    
     //this function add question for the player one
     void PassAndPlay::questionsOne(std::string& pNameOne, void (*accessReqOne)(void))
-    {        
-        addQuestionOne(Question("Which of the following is not a fundamental data type in C++?", "bool", "double", "string", "int", 'c'));
-        addQuestionOne(Question("Which of the following is a correct way to declare a pointer to an integer variable in C++?", "int* p;", "int* p;", "int* p;", "all of the above", 'd'));
-        addQuestionOne(Question("Which of the following statements is true about pointers in C++?", "Pointers can only be used with arrays.", "Pointers cannot be passed as arguments to functions.", "Pointers cannot be assigned to NULL.", "Pointers can be used to dynamically allocate memory.", 'd'));
-        addQuestionOne(Question("Which of the following operators is used for dynamic memory allocation in C++?", "new", "delete", "Malloc", "Free", 'c'));
-        addQuestionOne(Question("It is the memory address of a variable", "Arithmetic operator", "Typedef", "Pointers", "Point", 'a'));
-        addQuestionOne(Question("What is a class in C++?", "function", "predefined", "user defined", "varibale", 'a'));
-        addQuestionOne(Question("By default access to members of a C++ class is ____________?", "public", "protected", "privacy", "private", 'd'));
-        addQuestionOne(Question("Variable is just an array of characters. ", "one dimensional", "c string", "two dimensional", "dimensional", 'a'));
-        addQuestionOne(Question("this operator use for conditional operator", "?", "=", "+", "==", 'a'));
-        addQuestionOne(Question("this variable cannot be access outside the file", "static varibale", "variable", "global variable", "local variable", 'a'));
-    
+    {   
+        fillVect(listOfQuestionPOne, questionFileListOne, a, pNameOne);  
         displayQuestion(pNameOne, listOfQuestionPOne, accessReqOne);
     }    
 }
