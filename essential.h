@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <random>
+#include <vector>
 
 namespace essential
 {
@@ -35,34 +36,34 @@ namespace essential
     void borderTwo();
     void ebodTwo();
     void border();
-    void resultScreen(void (*mainMenu)(void));
+    void asciiArtResult(void (*mainMenu)(void));
     void askToMenu(void (*menu)(void));
-    void gameOverScreen(void (*func)(void));
+    void asciiArtGameOver(void (*func)(void));
 
     void ebodTwo()
     {
  			
 		for(int x = 20; x < 103; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(x,7);	
             std::cout<<char(205);
 		}
 
 		for(int x = 8; x < 13; x++)
         {
-			setcolor(CYAN);
+			setcolor(DARK_CYAN);
 			gotoXY(20,x);	
 		    std::cout<<char(186);
 		}
 
 		for(int x = 8; x < 13; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(103,x);	
             std::cout<<char(186);
 		}
-			setcolor(CYAN);
+			setcolor(DARK_CYAN);
 
 		gotoXY(20,7);	
 		std::cout<<char(201);
@@ -79,7 +80,7 @@ namespace essential
  			
 		for(int x = 20; x < 103; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(x,4);	
             std::cout<<char(205);
 		}
@@ -93,18 +94,18 @@ namespace essential
 
 		for(int x = 5; x < 13; x++)
         {
-			setcolor(CYAN);
+			setcolor(DARK_CYAN);
 			gotoXY(20,x);	
 		    std::cout<<char(186);
 		}
 
 		for(int x = 5; x < 13; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(103,x);	
             std::cout<<char(186);
 		}
-			setcolor(CYAN);
+			setcolor(DARK_CYAN);
 
 		gotoXY(20,4);	
 		std::cout<<char(201);
@@ -120,26 +121,26 @@ namespace essential
     {
         for(int x = 13; x < 16; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(20,x);	
             std::cout<<char(186);
         }
 
         for(int x = 20; x < 103; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(x,16);	
             std::cout<<char(205);
         }
 
         for(int x = 13; x < 16; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(103,x);	
             std::cout<<char(186);
         }
 
-        essential::setcolor(essential::CYAN);
+        essential::setcolor(essential::DARK_CYAN);
         gotoXY(103,16);	
         std::cout<<char(188);
         gotoXY(20,16);	
@@ -151,26 +152,26 @@ namespace essential
     {
         for(int x = 13; x < 16; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(20,x);	
             std::cout<<char(186);
         }
 
         for(int x = 20; x < 103; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(x,16);	
             std::cout<<char(205);
         }
 
         for(int x = 13; x < 16; x++)
         {
-            setcolor(CYAN);
+            setcolor(DARK_CYAN);
             gotoXY(103,x);	
             std::cout<<char(186);
         }
 
-        essential::setcolor(essential::CYAN);
+        essential::setcolor(essential::DARK_CYAN);
         gotoXY(103,16);	
         std::cout<<char(188);
         gotoXY(20,16);	
@@ -238,11 +239,11 @@ namespace essential
         }
     }
 
-    void gameOverScreen(void (*func)(void))
-    {
+    void asciiArtGameOver(void (*func)(void))
+    {  
         ebodTwo();
         border();
-            
+
         gotoXY(29,1);
         essential::setcolor(essential::RED);
         std::cout <<R"( _____                        _____                )";
@@ -288,11 +289,11 @@ namespace essential
         }
     }
 
-    void resultScreen(void (*mainMenu)(void))
+    void asciiArtResult(void (*mainMenu)(void))
     {
-        essential::ebodTwo();
-        essential::border();
-        
+        ebodTwo();
+        border();
+
         gotoXY(29,1);
         essential::setcolor(essential::GREEN);
         std::cout <<R"(______ _____ _____ _   _ _    _____ )";
